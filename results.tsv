@@ -1,0 +1,22 @@
+iteration	change	avg_ms	delta_ms	result	commit
+0	baseline (naive N+1, SELECT *, no cache)	74.3000	0	baseline	-
+1	eager load reviews/tags + withCount/withAvg	53.2000	-21.1000	keep	c5c44b5
+2	select only id,name,price,category	49.3000	-3.9000	keep	8ce05a0
+3	Cache::remember() with smart cache key	7.1000	-42.2000	keep	fcf364e
+4	constrain eager-loaded relation columns	7.2000	+0.1000	discard	(reverted)
+5	drop eager loading of reviews/tags	6.5000	-0.6000	keep	815a7bd
+6	drop withCount/withAvg aggregates	6.4000	-0.1000	keep	53fd068
+7	cache pre-converted array	6.4000	0	discard	(reverted)
+8	simplePaginate() skip COUNT query	6.2000	-0.2000	keep	6520d9d
+9	DB::table() raw query builder	6.6000	+0.4000	discard	(reverted)
+10	whitelist sort columns	6.3000	+0.1000	discard	(reverted)
+11	cache JSON string + raw response	6.4000	+0.2000	discard	(reverted)
+12	Cache::rememberForever()	6.3000	+0.1000	discard	(reverted)
+13	manual Cache::get/put	6.3000	+0.1000	discard	(reverted)
+14	toBase() skip hydration	6.4000	+0.2000	discard	(reverted)
+15	compact inlined code	6.4000	+0.2000	discard	(reverted)
+16	file cache instead of database cache	-	-	crash (test fail)	(reverted)
+17	file cache + toArray()	-	-	crash (test fail)	(reverted)
+18	cache toArray() in DB cache	6.3000	+0.1000	discard	(reverted)
+19	query() + strict checks	6.3000	+0.1000	discard	(reverted)
+20	JSON encoding flags	6.4000	+0.2000	discard	(reverted)
