@@ -57,7 +57,7 @@ class ProductController extends Controller
         $cacheKey = "products:{$category}:{$sortBy}:{$sortDir}:{$perPage}:{$page}";
 
         $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
-            $query = Product::select(['id', 'name', 'price', 'category'])->toBase();
+            $query = Product::select(['id', 'name', 'price', 'category']);
 
             if ($category) {
                 $query->where('category', $category);
