@@ -47,7 +47,8 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Product::with(['reviews', 'tags'])
+        $query = Product::select(['id', 'name', 'price', 'category'])
+            ->with(['reviews', 'tags'])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
 
