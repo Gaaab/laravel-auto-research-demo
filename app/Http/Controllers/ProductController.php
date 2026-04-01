@@ -49,8 +49,9 @@ class ProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         $category = $request->input('category', '');
-        $sortBy = $request->input('sort', 'id');
-        $sortDir = $request->input('sort_dir', 'asc');
+        $allowedSorts = ['id', 'name', 'price', 'category'];
+        $sortBy = in_array($request->input('sort', 'id'), $allowedSorts) ? $request->input('sort', 'id') : 'id';
+        $sortDir = $request->input('sort_dir', 'asc') === 'desc' ? 'desc' : 'asc';
         $perPage = (int) $request->input('per_page', 50);
         $page = (int) $request->input('page', 1);
 
