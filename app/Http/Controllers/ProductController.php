@@ -48,17 +48,26 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $key = 'products:' . $request->input('category', '') . ':' . $request->input('sort', 'id') . ':' . $request->input('sort_dir', 'asc') . ':' . $request->input('per_page', 50) . ':' . $request->input('page', 1);
+        $category = $request->input('category', '');
+        $sortBy = $request->input('sort', 'id');
+        $sortDir = $request->input('sort_dir', 'asc');
+        $perPage = (int) $request->input('per_page', 50);
+        $page = (int) $request->input('page', 1);
 
-        return response()->json(Cache::remember($key, 60, function () use ($request) {
+        $cacheKey = "products:{$category}:{$sortBy}:{$sortDir}:{$perPage}:{$page}";
+
+        $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
             $query = Product::select(['id', 'name', 'price', 'category']);
 
-            if ($request->has('category')) {
-                $query->where('category', $request->input('category'));
+            if ($category) {
+                $query->where('category', $category);
             }
 
-            return $query->orderBy($request->input('sort', 'id'), $request->input('sort_dir', 'asc'))
-                ->simplePaginate((int) $request->input('per_page', 50));
-        }));
+            $query->orderBy($sortBy, $sortDir);
+
+            return $query->simplePaginate($perPage);
+        });
+
+        return response()->json($products);
     }
 }
