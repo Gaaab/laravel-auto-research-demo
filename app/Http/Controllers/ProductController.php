@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -47,7 +46,7 @@ class ProductController extends Controller
      * Each product in "data" MUST include at minimum: id, name, price, category.
      * Products may also include: reviews, tags, description, sku, etc.
      */
-    public function index(Request $request): JsonResponse|Response
+    public function index(Request $request): JsonResponse
     {
         $category = $request->input('category', '');
         $sortBy = $request->input('sort', 'id');
@@ -57,7 +56,7 @@ class ProductController extends Controller
 
         $cacheKey = "products:{$category}:{$sortBy}:{$sortDir}:{$perPage}:{$page}";
 
-        $json = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
+        $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
             $query = Product::select(['id', 'name', 'price', 'category']);
 
             if ($category) {
@@ -66,9 +65,9 @@ class ProductController extends Controller
 
             $query->orderBy($sortBy, $sortDir);
 
-            return json_encode($query->simplePaginate($perPage));
+            return $query->simplePaginate($perPage);
         });
 
-        return response($json, 200, ['Content-Type' => 'application/json']);
+        return response()->json($products);
     }
 }
