@@ -56,7 +56,7 @@ class ProductController extends Controller
 
         $cacheKey = "products:{$category}:{$sortBy}:{$sortDir}:{$perPage}:{$page}";
 
-        $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
+        $json = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
             $query = Product::select(['id', 'name', 'price', 'category']);
 
             if ($category) {
@@ -65,9 +65,9 @@ class ProductController extends Controller
 
             $query->orderBy($sortBy, $sortDir);
 
-            return $query->paginate($perPage);
+            return $query->paginate($perPage)->toArray();
         });
 
-        return response()->json($products);
+        return response()->json($json);
     }
 }
