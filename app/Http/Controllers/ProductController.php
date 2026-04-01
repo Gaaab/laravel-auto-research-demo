@@ -68,6 +68,6 @@ class ProductController extends Controller
             return $query->simplePaginate($perPage);
         });
 
-        return response()->json($products);
+        return response()->json($products, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 }
