@@ -65,7 +65,7 @@ class ProductController extends Controller
 
             $query->orderBy($sortBy, $sortDir);
 
-            return $query->paginate($perPage);
+            return $query->simplePaginate($perPage);
         });
 
         return response()->json($products);
