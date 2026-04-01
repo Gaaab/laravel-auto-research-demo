@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * =============================================================================
@@ -57,7 +57,7 @@ class ProductController extends Controller
         $cacheKey = "products:{$category}:{$sortBy}:{$sortDir}:{$perPage}:{$page}";
 
         $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
-            $query = Product::select(['id', 'name', 'price', 'category']);
+            $query = DB::table('products')->select(['id', 'name', 'price', 'category']);
 
             if ($category) {
                 $query->where('category', $category);
