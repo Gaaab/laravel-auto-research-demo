@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * =============================================================================
@@ -47,21 +48,28 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Product::select(['id', 'name', 'price', 'category'])
-            ->with(['reviews', 'tags'])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating');
-
-        if ($request->has('category')) {
-            $query->where('category', $request->input('category'));
-        }
-
+        $category = $request->input('category', '');
         $sortBy = $request->input('sort', 'id');
         $sortDir = $request->input('sort_dir', 'asc');
-        $query->orderBy($sortBy, $sortDir);
-
         $perPage = (int) $request->input('per_page', 50);
-        $products = $query->paginate($perPage);
+        $page = (int) $request->input('page', 1);
+
+        $cacheKey = "products:{$category}:{$sortBy}:{$sortDir}:{$perPage}:{$page}";
+
+        $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
+            $query = Product::select(['id', 'name', 'price', 'category'])
+                ->with(['reviews', 'tags'])
+                ->withCount('reviews')
+                ->withAvg('reviews', 'rating');
+
+            if ($category) {
+                $query->where('category', $category);
+            }
+
+            $query->orderBy($sortBy, $sortDir);
+
+            return $query->paginate($perPage);
+        });
 
         return response()->json($products);
     }
