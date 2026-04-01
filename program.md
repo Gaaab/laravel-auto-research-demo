@@ -1,28 +1,28 @@
-# Laravel Autoresearch — Product API Optimization
-
-## Goal
-Minimize average response time (ms) for GET /api/products.
-Metric: avg_ms from benchmark.sh. Lower is better.
+# Laravel Autoresearch
 
 ## Setup
-1. git checkout -b autoresearch/products
-2. Read ProductController.php — the ONLY file you modify
-3. Run ./benchmark.sh to get baseline avg_ms
-4. Initialize results.tsv with header row
+1. git checkout -b autoresearch/<tag>
+2. Read ProductController.php
+   — the ONLY file you modify
+3. Run ./benchmark.sh for baseline
+4. Initialize results.tsv
 
 ## Experiment Loop
-1. Form a hypothesis (e.g. "eager loading will reduce N+1 queries")
-2. Edit ProductController.php
-3. Run ./benchmark.sh > run.log 2>&1
+1. Edit ProductController.php
+2. git commit
+3. ./benchmark.sh > run.log 2>&1
 4. grep "avg_ms:" run.log
-5. If avg_ms improved → git commit, else → git reset --hard
-6. Log result to results.tsv, GOTO 1
+5. Improved → keep, worse → git reset
+6. Log to results.tsv, GOTO 1
 
-## Research Directions (try these)
-- Eager loading relationships
-- Query column selection (avoid SELECT *)
-- Redis cache with smart invalidation
-- Cursor pagination vs offset pagination
-- Database indexing via migration
-- Response transformation with API Resources
-- Query builder vs raw SQL for complex filters
+## Research Directions
+- Eager loading with ->with()
+- Column selection with ->select()
+- Cache::remember() with smart keys
+- Cursor pagination
+- ->withCount() / ->withAvg()
+- API Resources for serialization
+
+## NEVER STOP
+The human might be asleep.
+You are autonomous. Run until interrupted.
