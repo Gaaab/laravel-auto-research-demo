@@ -47,31 +47,20 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        // Build query — no eager loading, triggers N+1 problem
-        $query = Product::query();
+        $query = Product::with(['reviews', 'tags'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
 
-        // Filter by category
         if ($request->has('category')) {
             $query->where('category', $request->input('category'));
         }
 
-        // Sort
         $sortBy = $request->input('sort', 'id');
         $sortDir = $request->input('sort_dir', 'asc');
         $query->orderBy($sortBy, $sortDir);
 
-        // Paginate — standard offset pagination
         $perPage = (int) $request->input('per_page', 50);
         $products = $query->paginate($perPage);
-
-        // Manually load relationships one-by-one (N+1 problem!)
-        // This is intentionally slow — the agent should fix this
-        foreach ($products as $product) {
-            $product->reviews_list = $product->reviews()->get();
-            $product->tags_list = $product->tags()->get();
-            $product->review_count = $product->reviews()->count();
-            $product->average_rating = $product->reviews()->avg('rating');
-        }
 
         return response()->json($products);
     }
