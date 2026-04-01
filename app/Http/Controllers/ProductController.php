@@ -58,7 +58,6 @@ class ProductController extends Controller
 
         $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
             $query = Product::select(['id', 'name', 'price', 'category'])
-                ->with(['reviews', 'tags'])
                 ->withCount('reviews')
                 ->withAvg('reviews', 'rating');
 
