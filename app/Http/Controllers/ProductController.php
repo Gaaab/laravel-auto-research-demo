@@ -48,18 +48,18 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $category = $request->input('category', '');
-        $sortBy = $request->input('sort', 'id');
-        $sortDir = $request->input('sort_dir', 'asc');
-        $perPage = (int) $request->input('per_page', 50);
-        $page = (int) $request->input('page', 1);
+        $category = $request->query('category', '');
+        $sortBy = $request->query('sort', 'id');
+        $sortDir = $request->query('sort_dir', 'asc');
+        $perPage = (int) $request->query('per_page', 50);
+        $page = (int) $request->query('page', 1);
 
         $cacheKey = "products:{$category}:{$sortBy}:{$sortDir}:{$perPage}:{$page}";
 
         $products = Cache::remember($cacheKey, 60, function () use ($category, $sortBy, $sortDir, $perPage) {
-            $query = Product::select(['id', 'name', 'price', 'category']);
+            $query = Product::select('id', 'name', 'price', 'category');
 
-            if ($category) {
+            if ($category !== '') {
                 $query->where('category', $category);
             }
 
